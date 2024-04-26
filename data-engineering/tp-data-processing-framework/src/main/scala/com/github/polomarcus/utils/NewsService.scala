@@ -24,6 +24,7 @@ object NewsService {
    */
   def enrichNewsWithClimateMetadata(newsDataset: Dataset[News]) : Dataset[News] = {
     newsDataset.map { news =>
+
       val enrichedNews = News(
         news.title,
         news.description,
@@ -35,10 +36,9 @@ object NewsService {
         news.editorDeputy,
         news.url,
         news.urlTvNews,
-        news.containsWordGlobalWarming, // @TODO: we need to apply a function here from ClimateService
+        news.containsWordGlobalWarming=ClimateService.isClimateRelated(news.title+news.description), // @TODO: we need to apply a function here from ClimateService
         news.media
       )
-
       enrichedNews
     }
   }
@@ -51,9 +51,9 @@ object NewsService {
    * @param newsDataset
    * @return newsDataset but with containsWordGlobalWarming to true
    */
-  def filterNews(newsDataset: Dataset[News]) : Dataset[News] = {
+  def filterNews(newsDataset: Dataset[News]): Dataset[News] = {
     newsDataset.filter { news =>
-      ??? //@TODO complete here
+      ClimateService.isClimateRelated(news.title) || ClimateService.isClimateRelated(news.description)
     }
   }
 
@@ -67,6 +67,7 @@ object NewsService {
    */
   def getNumberOfNews(dataset: Dataset[News]): Long = {
     //@TODO look a the Spark API to know how to count
-    return 1 // code here
+    return dataset.count()
+    // code here
   }
 }
